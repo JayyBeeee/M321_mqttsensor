@@ -1,0 +1,60 @@
+version: '3.7'
+
+networks:
+  M321:
+
+services:
+  mqttbroker:
+    image: eclipse-mosquitto
+    volumes:
+      - ./Config/mosquitto.conf:/mosquitto/config/mosquitto.conf
+    ports:
+      - "9001:9001"
+      - "1883:1883"
+    networks:
+      - M321
+
+  sensor1:
+    image: ch33sy/sensorapp
+    environment:
+      - SERVER=mqttbroker
+      - TOPIC=sensor1
+      - SUBID=sub1
+      - PUBID=pub1
+    depends_on:
+      - grafana
+    networks:
+      - M321
+
+  sensor2:
+    image: ch33sy/sensorapp
+    environment:
+      - SERVER=mqttbroker
+      - TOPIC=sensor2
+      - SUBID=sub2
+      - PUBID=pub2
+    depends_on:
+      - sensor1
+    networks:
+      - M321
+
+  sensor3:
+    image: ch33sy/sensorapp
+    environment:
+      - SERVER=mqttbroker
+      - TOPIC=sensor3
+      - SUBID=sub3
+      - PUBID=pub3
+    depends_on:
+      - sensor2
+    networks:
+      - M321
+
+  grafana:
+    image: grafana/grafana
+    depends_on:
+      - mqttbroker
+    ports:
+      - "3000:3000"
+    networks:
+      - M321
