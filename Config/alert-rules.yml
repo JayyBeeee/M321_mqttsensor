@@ -1,0 +1,21 @@
+groups:
+- name: node_monitoring
+  rules:
+  - alert: Node1-Down
+    expr: up{instance="demoexporter1:9100",job="nodes"} == 0
+    for: 15s
+    labels:
+      severity: critical
+    annotations:
+      summary: "Sensor 'demoexporter1' down"
+      description: "The exporter 'demoexporter1' is down for +15 seconds."
+
+  - alert: Node2-Down
+    expr: up{instance="demoexporter2:9100",job="nodes"} == 0
+    for: 15s
+    labels:
+      severity: critical
+    annotations:
+      summary: "Sensor 'demoexporter2' down"
+      description: "The exporter 'demoexporter2' is down for +15 seconds."
+  

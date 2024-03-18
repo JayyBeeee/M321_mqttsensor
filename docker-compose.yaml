@@ -9,11 +9,11 @@ services:
     volumes:
       - ./Config/mosquitto.conf:/mosquitto/config/mosquitto.conf
     ports:
-      - "9001:9001"
-      - "1883:1883"
+      - 9001:9001
+      - 1883:1883
     networks:
       - M321
-
+  
   sensor1:
     image: ch33sy/sensorapp
     environment:
@@ -55,6 +55,47 @@ services:
     depends_on:
       - mqttbroker
     ports:
-      - "3000:3000"
+      - 3000:3000
+    networks:
+      - M321
+
+  node-exporter1:
+    image: prom/node-exporter
+    container_name: demoexporter1
+    ports:
+      - 9100:9100
+    networks:
+      - M321
+
+  node-exporter2:
+    image: prom/node-exporter
+    container_name: demoexporter2
+    ports:
+      - 9200:9200
+    networks:
+      - M321
+
+  prometheus:
+    image: prom/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+    ports:
+      - 9090:9090
+    volumes:
+      - ./Config/prometheus.yml:/etc/prometheus/prometheus.yml
+      - ./Config/alert-rules.yml:/etc/prometheus/rules.yml
+    networks:
+      - M321
+
+  cadvisor:
+    image: gcr.io/cadvisor/cadvisor:latest
+    container_name: cadvisor
+    ports:
+      - "8080:8080"
+    volumes: 
+      - "/:/rootfs:ro"
+      - "/var/run:/var/run:ro"
+      - "/sys:/sys:ro"
+      - "/var/lib/docker/:/var/lib/docker:ro"
     networks:
       - M321
